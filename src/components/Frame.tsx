@@ -7,6 +7,9 @@ import sdk, {
   type Context,
 } from "@farcaster/frame-sdk";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card";
+import { createPublicClient, http, formatGwei } from 'viem';
+import { mainnet, optimism, base, arbitrum } from 'viem/chains';
+import { SUPPORTED_CHAINS } from "~/lib/constants";
 
 import { config } from "~/components/providers/WagmiProvider";
 import { PurpleButton } from "~/components/ui/PurpleButton";
@@ -17,19 +20,64 @@ import { createStore } from "mipd";
 import { Label } from "~/components/ui/label";
 import { PROJECT_TITLE } from "~/lib/constants";
 
-function ExampleCard() {
+function GasPriceCard() {
+  const [gasPrices, setGasPrices] = useState<Record<number, string>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchGasPrices() {
+      const clients = {
+        1: createPublicClient({ chain: mainnet, transport: http() }),
+        10: createPublicClient({ chain: optimism, transport: http() }),
+        8453: createPublicClient({ chain: base, transport: http() }),
+        42161: createPublicClient({ chain: arbitrum, transport: http() }),
+      };
+
+      const prices: Record<number, string> = {};
+      
+      await Promise.all(
+        SUPPORTED_CHAINS.map(async ({ id }) => {
+          try {
+            const gasPrice = await clients[id].getGasPrice();
+            prices[id] = formatGwei(gasPrice);
+          } catch (error) {
+            console.error(`Error fetching gas price for chain ${id}:`, error);
+            prices[id] = 'Error';
+          }
+        })
+      );
+
+      setGasPrices(prices);
+      setLoading(false);
+    }
+
+    fetchGasPrices();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchGasPrices, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Card className="border-neutral-200 bg-white">
       <CardHeader>
-        <CardTitle className="text-neutral-900">Welcome to the Frame Template</CardTitle>
+        <CardTitle className="text-neutral-900">Current Gas Prices</CardTitle>
         <CardDescription className="text-neutral-600">
-          This is an example card that you can customize or remove
+          Real-time gas prices across major networks (in Gwei)
         </CardDescription>
       </CardHeader>
       <CardContent className="text-neutral-800">
-        <p>
-          Your frame content goes here. The text is intentionally dark to ensure good readability.
-        </p>
+        {loading ? (
+          <p className="text-center">Loading gas prices...</p>
+        ) : (
+          <div className="space-y-2">
+            {SUPPORTED_CHAINS.map(({ id, name }) => (
+              <div key={id} className="flex justify-between items-center">
+                <span className="font-medium">{name}:</span>
+                <span className="font-mono">{gasPrices[id] || 'N/A'}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -137,7 +185,7 @@ export default function Frame(
     >
       <div className="w-[300px] mx-auto py-2 px-2">
         <h1 className="text-2xl font-bold text-center mb-4 text-neutral-900">{title}</h1>
-        <ExampleCard />
+        <GasPriceCard />
       </div>
     </div>
   );
