@@ -33,7 +33,14 @@ function GasPriceCard() {
   const [gasPrices, setGasPrices] = useState<Record<number, string>>({});
   const [ethPrices, setEthPrices] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(true);
-  const [selectedChains, setSelectedChains] = useState<number[]>(DEFAULT_CHAINS);
+  const [selectedChains, setSelectedChains] = useState<number[]>(() => {
+    // Load from localStorage if available, otherwise use defaults
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('selectedChains');
+      return stored ? JSON.parse(stored) : DEFAULT_CHAINS;
+    }
+    return DEFAULT_CHAINS;
+  });
   const [customChainId, setCustomChainId] = useState("");
   const [open, setOpen] = useState(false);
 
@@ -136,11 +143,13 @@ function GasPriceCard() {
                           key={id}
                           value={name}
                           onSelect={() => {
-                            setSelectedChains(prev => 
-                              prev.includes(id) 
+                            setSelectedChains(prev => {
+                              const newChains = prev.includes(id) 
                                 ? prev.filter(x => x !== id)
-                                : [...prev, id]
-                            );
+                                : [...prev, id];
+                              localStorage.setItem('selectedChains', JSON.stringify(newChains));
+                              return newChains;
+                            });
                             setOpen(false);
                           }}
                         >
@@ -167,7 +176,11 @@ function GasPriceCard() {
                   if (e.key === 'Enter' && customChainId) {
                     const chainId = parseInt(customChainId);
                     if (!selectedChains.includes(chainId)) {
-                      setSelectedChains(prev => [...prev, chainId]);
+                      setSelectedChains(prev => {
+                        const newChains = [...prev, chainId];
+                        localStorage.setItem('selectedChains', JSON.stringify(newChains));
+                        return newChains;
+                      });
                     }
                     setCustomChainId("");
                   }
