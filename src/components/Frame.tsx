@@ -17,7 +17,6 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { Input } from "~/components/ui/input";
-import { useEffect, useCallback, useState } from "react";
 import sdk, {
   AddFrame,
   SignIn as SignInCore,
