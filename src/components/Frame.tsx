@@ -51,6 +51,22 @@ function GasPriceCard() {
         10: createPublicClient({ chain: optimism, transport: http() }),
         8453: createPublicClient({ chain: base, transport: http() }),
         42161: createPublicClient({ chain: arbitrum, transport: http() }),
+        137: createPublicClient({
+          chain: {
+            id: 137,
+            name: 'Polygon',
+            nativeCurrency: {
+              decimals: 18,
+              name: 'MATIC',
+              symbol: 'MATIC'
+            },
+            rpcUrls: {
+              default: { http: ['https://polygon-rpc.com'] },
+              public: { http: ['https://polygon-rpc.com'] }
+            }
+          },
+          transport: http()
+        }),
       };
 
       // Add custom clients for selected chains
@@ -228,7 +244,7 @@ function GasPriceCard() {
                       {gasCost && (
                         <div className="text-xs text-gray-600">
                           ≈ {gasCost.toFixed(6)} ETH
-                          {usdCost && ` ($${usdCost.toFixed(2)})`}
+                          {usdCost && ` ($${usdCost.toFixed(4)})`}
                         </div>
                       )}
                     </div>
