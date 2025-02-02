@@ -5,11 +5,13 @@ export async function GET() {
 
   const config = {
     accountAssociation: {
-      header:
-        "eyJmaWQiOjM2MjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgyY2Q4NWEwOTMyNjFmNTkyNzA4MDRBNkVBNjk3Q2VBNENlQkVjYWZFIn0",
-      payload: "eyJkb21haW4iOiJmcmFtZXMtdjIudmVyY2VsLmFwcCJ9",
-      signature:
-        "MHhiNDIwMzQ1MGZkNzgzYTExZjRiOTllZTFlYjA3NmMwOTdjM2JkOTY1NGM2ODZjYjkyZTAyMzk2Y2Q0YjU2MWY1MjY5NjI5ZGQ5NTliYjU0YzEwOGI4OGVmNjdjMTVlZTdjZDc2YTRiMGU5NzkzNzA3YzkxYzFkOWFjNTg0YmQzNjFi",
+      message: {
+        domain: "chaingazer.vercel.app",
+        timestamp: 1738534380,
+        expirationTime: 1746310380
+      },
+      signature: "68d4047f6056d50f3db5fa2bf6a6e4573ac75033fa601f363b74ff9be1ae4fab6e305e70e2d490c2a5420117c19aef5d7feb6aff7430b77b9db25e1a15636e9e1c",
+      signingKey: "1fe4bb4b772852c2b80fc6e104d58d07e89158a12402b11e1e619e9a3449ac02"
     },
     frame: {
       version: "1",
