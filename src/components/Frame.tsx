@@ -104,7 +104,7 @@ function GasPriceCard() {
       <CardHeader>
         <CardTitle className="text-neutral-900">Current Gas Prices</CardTitle>
         <CardDescription className="text-neutral-600">
-          Real-time gas prices across major networks (in Gwei)
+          Real-time gas prices across major networks (in Gwei) for {GAS_UNITS.toLocaleString()} gas units
         </CardDescription>
       </CardHeader>
       <CardContent className="text-neutral-800">
