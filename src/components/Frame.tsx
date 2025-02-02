@@ -80,6 +80,7 @@ function GasPriceCard() {
       });
 
       const prices: Record<number, string> = {};
+      const ethPricesRecord: Record<number, number> = {};
       
       // Import getEthUsdPrice from constants
       const { getEthUsdPrice } = await import('~/lib/constants');
@@ -90,6 +91,7 @@ function GasPriceCard() {
           try {
             const gasPrice = await clients[id].getGasPrice();
             prices[id] = formatGwei(gasPrice);
+            ethPricesRecord[id] = ethUsdPrice;
           } catch (error) {
             console.error(`Error fetching gas price for chain ${id}:`, error);
             prices[id] = 'Error';
@@ -98,6 +100,7 @@ function GasPriceCard() {
       );
 
       setGasPrices(prices);
+      setEthPrices(ethPricesRecord);
       setLoading(false);
     }
 
@@ -203,9 +206,23 @@ function GasPriceCard() {
                 const usdCost = gasCost && ethPrices[id] ? gasCost * ethPrices[id] : null;
                 
                 return (
-                  <div key={id} className="flex justify-between items-center">
+                  <div key={id} className="flex justify-between items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => {
+                        setSelectedChains(prev => {
+                          const newChains = prev.filter(x => x !== id);
+                          localStorage.setItem('selectedChains', JSON.stringify(newChains));
+                          return newChains;
+                        });
+                      }}
+                    >
+                      ×
+                    </Button>
                     <span className="font-medium">{chain.name}:</span>
-                    <div className="text-right">
+                    <div className="text-right ml-auto">
                       <div className="font-mono">{gasPrice || 'N/A'} Gwei</div>
                       {gasCost && (
                         <div className="text-xs text-gray-600">
