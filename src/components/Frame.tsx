@@ -144,12 +144,13 @@ function GasPriceCard() {
                       {ALL_CHAINS.map(({ id, name }) => (
                         <CommandItem
                           key={id}
-                          value={name}
-                          onSelect={() => {
+                          value={name.toLowerCase()}
+                          onSelect={(currentValue) => {
+                            const chainId = id;
                             setSelectedChains(prev => {
-                              const newChains = prev.includes(id) 
-                                ? prev.filter(x => x !== id)
-                                : [...prev, id];
+                              const newChains = prev.includes(chainId)
+                                ? prev.filter(x => x !== chainId)
+                                : [...prev, chainId];
                               localStorage.setItem('selectedChains', JSON.stringify(newChains));
                               return newChains;
                             });
