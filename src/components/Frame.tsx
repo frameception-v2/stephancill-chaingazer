@@ -1,5 +1,22 @@
 "use client";
 
+import { useEffect, useCallback, useState, useMemo } from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "~/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import { Input } from "~/components/ui/input";
 import { useEffect, useCallback, useState } from "react";
 import sdk, {
   AddFrame,
@@ -9,27 +26,46 @@ import sdk, {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card";
 import { createPublicClient, http, formatGwei } from 'viem';
 import { mainnet, optimism, base, arbitrum } from 'viem/chains';
-import { SUPPORTED_CHAINS } from "~/lib/constants";
+import { ALL_CHAINS, DEFAULT_CHAINS, GAS_UNITS } from "~/lib/constants";
 import { createStore } from "mipd";
 import { PROJECT_TITLE } from "~/lib/constants";
 
 function GasPriceCard() {
   const [gasPrices, setGasPrices] = useState<Record<number, string>>({});
+  const [ethPrices, setEthPrices] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(true);
+  const [selectedChains, setSelectedChains] = useState<number[]>(DEFAULT_CHAINS);
+  const [customChainId, setCustomChainId] = useState("");
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     async function fetchGasPrices() {
-      const clients = {
+      const clients: Record<number, any> = {
         1: createPublicClient({ chain: mainnet, transport: http() }),
         10: createPublicClient({ chain: optimism, transport: http() }),
         8453: createPublicClient({ chain: base, transport: http() }),
         42161: createPublicClient({ chain: arbitrum, transport: http() }),
       };
 
+      // Add custom clients for selected chains
+      selectedChains.forEach(chainId => {
+        if (!clients[chainId]) {
+          clients[chainId] = createPublicClient({
+            chain: { id: chainId },
+            transport: http()
+          });
+        }
+      });
+
       const prices: Record<number, string> = {};
       
+      // Fetch ETH prices
+      const ethPriceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+      const ethPriceData = await ethPriceResponse.json();
+      const ethUsdPrice = ethPriceData.ethereum.usd;
+
       await Promise.all(
-        SUPPORTED_CHAINS.map(async ({ id }) => {
+        selectedChains.map(async (id) => {
           try {
             const gasPrice = await clients[id].getGasPrice();
             prices[id] = formatGwei(gasPrice);
@@ -45,8 +81,8 @@ function GasPriceCard() {
     }
 
     fetchGasPrices();
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchGasPrices, 30000);
+    // Refresh every second
+    const interval = setInterval(fetchGasPrices, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -62,13 +98,93 @@ function GasPriceCard() {
         {loading ? (
           <p className="text-center">Loading gas prices...</p>
         ) : (
-          <div className="space-y-2">
-            {SUPPORTED_CHAINS.map(({ id, name }) => (
-              <div key={id} className="flex justify-between items-center">
-                <span className="font-medium">{name}:</span>
-                <span className="font-mono">{gasPrices[id] || 'N/A'}</span>
-              </div>
-            ))}
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="justify-between"
+                  >
+                    Select chains
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search chain..." />
+                    <CommandEmpty>No chain found.</CommandEmpty>
+                    <CommandGroup>
+                      {ALL_CHAINS.map(({ id, name }) => (
+                        <CommandItem
+                          key={id}
+                          value={name}
+                          onSelect={() => {
+                            setSelectedChains(prev => 
+                              prev.includes(id) 
+                                ? prev.filter(x => x !== id)
+                                : [...prev, id]
+                            );
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedChains.includes(id) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              
+              <Input
+                type="number"
+                placeholder="Add chain ID"
+                value={customChainId}
+                onChange={(e) => setCustomChainId(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && customChainId) {
+                    const chainId = parseInt(customChainId);
+                    if (!selectedChains.includes(chainId)) {
+                      setSelectedChains(prev => [...prev, chainId]);
+                    }
+                    setCustomChainId("");
+                  }
+                }}
+                className="w-32"
+              />
+            </div>
+
+            <div className="space-y-2">
+              {selectedChains.map((id) => {
+                const chain = ALL_CHAINS.find(c => c.id === id) || { name: `Chain ${id}` };
+                const gasPrice = gasPrices[id];
+                const gasCost = gasPrice ? parseFloat(gasPrice) * GAS_UNITS / 1e9 : null;
+                const usdCost = gasCost && ethPrices[id] ? gasCost * ethPrices[id] : null;
+                
+                return (
+                  <div key={id} className="flex justify-between items-center">
+                    <span className="font-medium">{chain.name}:</span>
+                    <div className="text-right">
+                      <div className="font-mono">{gasPrice || 'N/A'} Gwei</div>
+                      {gasCost && (
+                        <div className="text-xs text-gray-600">
+                          ≈ {gasCost.toFixed(6)} ETH
+                          {usdCost && ` ($${usdCost.toFixed(2)})`}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </CardContent>
