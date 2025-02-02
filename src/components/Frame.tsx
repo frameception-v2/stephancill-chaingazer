@@ -361,6 +361,20 @@ export default function Frame(
     >
       <div className="w-[300px] mx-auto py-2 px-2">
         <h1 className="text-2xl font-bold text-center mb-4 text-neutral-900">{title}</h1>
+        {!added && (
+          <div className="mb-4">
+            <Button 
+              onClick={addFrame}
+              className="w-full"
+              variant="outline"
+            >
+              Add to Warpcast
+            </Button>
+            {addFrameResult && (
+              <p className="text-sm text-red-500 mt-2">{addFrameResult}</p>
+            )}
+          </div>
+        )}
         <GasPriceCard />
       </div>
     </div>
