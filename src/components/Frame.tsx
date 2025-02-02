@@ -50,7 +50,23 @@ function GasPriceCard() {
       selectedChains.forEach(chainId => {
         if (!clients[chainId]) {
           clients[chainId] = createPublicClient({
-            chain: { id: chainId },
+            chain: {
+              id: chainId,
+              name: ALL_CHAINS.find(c => c.id === chainId)?.name || `Chain ${chainId}`,
+              nativeCurrency: {
+                decimals: 18,
+                name: 'Ether',
+                symbol: 'ETH',
+              },
+              rpcUrls: {
+                default: { 
+                  http: [`https://rpc.ankr.com/${chainId}`]
+                },
+                public: {
+                  http: [`https://rpc.ankr.com/${chainId}`]
+                }
+              }
+            },
             transport: http()
           });
         }
