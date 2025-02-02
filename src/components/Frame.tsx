@@ -75,9 +75,7 @@ function GasPriceCard() {
       const prices: Record<number, string> = {};
       
       // Fetch ETH prices
-      const ethPriceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
-      const ethPriceData = await ethPriceResponse.json();
-      const ethUsdPrice = ethPriceData.ethereum.usd;
+      const ethUsdPrice = await getEthUsdPrice();
 
       await Promise.all(
         selectedChains.map(async (id) => {
@@ -178,7 +176,13 @@ function GasPriceCard() {
             </div>
 
             <div className="space-y-2">
-              {selectedChains.map((id) => {
+              {selectedChains
+                .sort((a, b) => {
+                  const priceA = parseFloat(gasPrices[a] || '999999');
+                  const priceB = parseFloat(gasPrices[b] || '999999');
+                  return priceA - priceB;
+                })
+                .map((id) => {
                 const chain = ALL_CHAINS.find(c => c.id === id) || { name: `Chain ${id}` };
                 const gasPrice = gasPrices[id];
                 const gasCost = gasPrice ? parseFloat(gasPrice) * GAS_UNITS / 1e9 : null;
