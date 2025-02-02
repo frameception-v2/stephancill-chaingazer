@@ -74,7 +74,8 @@ function GasPriceCard() {
 
       const prices: Record<number, string> = {};
       
-      // Fetch ETH prices
+      // Import getEthUsdPrice from constants
+      const { getEthUsdPrice } = await import('~/lib/constants');
       const ethUsdPrice = await getEthUsdPrice();
 
       await Promise.all(
@@ -97,7 +98,7 @@ function GasPriceCard() {
     // Refresh every second
     const interval = setInterval(fetchGasPrices, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedChains]); // Add selectedChains as dependency
 
   return (
     <Card className="border-neutral-200 bg-white">
