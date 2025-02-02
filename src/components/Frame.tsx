@@ -10,14 +10,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/com
 import { createPublicClient, http, formatGwei } from 'viem';
 import { mainnet, optimism, base, arbitrum } from 'viem/chains';
 import { SUPPORTED_CHAINS } from "~/lib/constants";
-
-import { config } from "~/components/providers/WagmiProvider";
-import { PurpleButton } from "~/components/ui/PurpleButton";
-import { truncateAddress } from "~/lib/truncateAddress";
-import { base, optimism } from "wagmi/chains";
-import { useSession } from "next-auth/react";
 import { createStore } from "mipd";
-import { Label } from "~/components/ui/label";
 import { PROJECT_TITLE } from "~/lib/constants";
 
 function GasPriceCard() {
