@@ -187,26 +187,41 @@ function GasPriceCard() {
                 </PopoverContent>
               </Popover>
               
-              <Input
-                type="number"
-                placeholder="Add chain ID"
-                value={customChainId}
-                onChange={(e) => setCustomChainId(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && customChainId) {
-                    const chainId = parseInt(customChainId);
-                    if (!selectedChains.includes(chainId)) {
-                      setSelectedChains(prev => {
-                        const newChains = [...prev, chainId];
-                        localStorage.setItem('selectedChains', JSON.stringify(newChains));
-                        return newChains;
-                      });
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Chain ID or RPC URL"
+                  value={customChainId}
+                  onChange={(e) => setCustomChainId(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && customChainId) {
+                      if (customChainId.startsWith('http')) {
+                        // Extract chain ID from RPC URL if possible
+                        const match = customChainId.match(/\/(\d+)$/);
+                        const chainId = match ? parseInt(match[1]) : null;
+                        if (chainId && !selectedChains.includes(chainId)) {
+                          setSelectedChains(prev => {
+                            const newChains = [...prev, chainId];
+                            localStorage.setItem('selectedChains', JSON.stringify(newChains));
+                            return newChains;
+                          });
+                        }
+                      } else {
+                        const chainId = parseInt(customChainId);
+                        if (!isNaN(chainId) && !selectedChains.includes(chainId)) {
+                          setSelectedChains(prev => {
+                            const newChains = [...prev, chainId];
+                            localStorage.setItem('selectedChains', JSON.stringify(newChains));
+                            return newChains;
+                          });
+                        }
+                      }
+                      setCustomChainId("");
                     }
-                    setCustomChainId("");
-                  }
-                }}
-                className="w-32"
-              />
+                  }}
+                  className="w-48"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
