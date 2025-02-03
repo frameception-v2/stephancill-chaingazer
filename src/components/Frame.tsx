@@ -156,7 +156,7 @@ function GasPriceCard() {
                   <Command>
                     <CommandInput placeholder="Search chain..." />
                     <CommandEmpty>No chain found.</CommandEmpty>
-                    <CommandGroup>
+                    <CommandGroup heading="Available Chains">
                       {ALL_CHAINS.map(({ id, name }) => (
                         <CommandItem
                           key={id}
