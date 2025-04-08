@@ -238,7 +238,7 @@ function GasPriceCard() {
                 const usdCost = gasCost && ethPrices[id] ? gasCost * ethPrices[id] : null;
                 
                 return (
-                  <div key={id} className="flex justify-between items-center gap-2">
+                  <div key={id} className="flex justify-between items-center gap-2 px-4 py-2 rounded-lg border bg-white dark:bg-neutral-800 dark:border-neutral-700 border-neutral-200">
                     <Button
                       variant="ghost"
                       size="icon"
