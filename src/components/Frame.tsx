@@ -256,7 +256,7 @@ function GasPriceCard() {
                     <span className="font-medium dark:text-neutral-100">{chain.name}:</span>
                     <div className="text-right ml-auto">
                       <div className="font-mono text-right">
-                        {gasPrice ? <span className="tabular-nums">{parseFloat(gasPrice).toFixed(3).padStart(7, ' ')}</span> : 'N/A'} Gwei
+                        {gasPrice ? <span className="tabular-nums dark:text-neutral-100">{parseFloat(gasPrice).toFixed(3).padStart(7, ' ')}</span> : 'N/A'} Gwei
                       </div>
                       {gasCost && (
                         <div className="text-xs text-gray-600 dark:text-neutral-400">
