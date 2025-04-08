@@ -242,7 +242,7 @@ function GasPriceCard() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6"
+                      className="h-6 w-6 dark:text-neutral-100 dark:hover:bg-neutral-700"
                       onClick={() => {
                         setSelectedChains(prev => {
                           const newChains = prev.filter(x => x !== id);
@@ -253,7 +253,7 @@ function GasPriceCard() {
                     >
                       ×
                     </Button>
-                    <span className="font-medium">{chain.name}:</span>
+                    <span className="font-medium dark:text-neutral-100">{chain.name}:</span>
                     <div className="text-right ml-auto">
                       <div className="font-mono text-right">
                         {gasPrice ? <span className="tabular-nums">{parseFloat(gasPrice).toFixed(3).padStart(7, ' ')}</span> : 'N/A'} Gwei
