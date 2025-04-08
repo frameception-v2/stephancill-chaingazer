@@ -127,10 +127,10 @@ function GasPriceCard() {
   }, [selectedChains]); // Add selectedChains as dependency
 
   return (
-    <Card className="border-neutral-200 bg-white">
+    <Card className="border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-700">
       <CardHeader>
-        <CardTitle className="text-neutral-900">Current Gas Prices</CardTitle>
-        <CardDescription className="text-neutral-600">
+        <CardTitle className="text-neutral-900 dark:text-neutral-100">Current Gas Prices</CardTitle>
+        <CardDescription className="text-neutral-600 dark:text-neutral-300">
           Real-time gas prices across major networks (in Gwei) for {GAS_UNITS.toLocaleString()} gas units
         </CardDescription>
       </CardHeader>
@@ -255,9 +255,11 @@ function GasPriceCard() {
                     </Button>
                     <span className="font-medium">{chain.name}:</span>
                     <div className="text-right ml-auto">
-                      <div className="font-mono">{gasPrice || 'N/A'} Gwei</div>
+                      <div className="font-mono text-right">
+                        {gasPrice ? <span className="tabular-nums">{parseFloat(gasPrice).toFixed(3)}</span> : 'N/A'} Gwei
+                      </div>
                       {gasCost && (
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-gray-600 dark:text-neutral-400">
                           ≈ {gasCost.toFixed(6)} ETH
                           {usdCost && ` ($${usdCost.toFixed(4)})`}
                         </div>
@@ -375,7 +377,7 @@ export default function Frame(
       }}
     >
       <div className="w-full sm:w-[300px] sm:mx-auto">
-        <h1 className="text-2xl font-bold text-center mb-4 text-neutral-900">{title}</h1>
+        <h1 className="text-2xl font-bold text-center mb-4 text-neutral-900 dark:text-neutral-100">{title}</h1>
         <GasPriceCard />
       </div>
     </div>
