@@ -9,6 +9,7 @@ import {
   setUserNotificationDetails,
 } from "~/lib/kv";
 import { sendFrameNotification } from "~/lib/notifs";
+import { PROJECT_TITLE } from "~/lib/constants";
 
 export async function POST(request: NextRequest) {
   const requestJson = await request.json();
@@ -51,8 +52,8 @@ export async function POST(request: NextRequest) {
         await setUserNotificationDetails(fid, event.notificationDetails);
         await sendFrameNotification({
           fid,
-          title: "Welcome to Frames v2",
-          body: "Frame is now added to your client",
+          title: `Welcome to ${PROJECT_TITLE}`,
+          body: "the mini app is now added to your client",
         });
       } else {
         await deleteUserNotificationDetails(fid);
